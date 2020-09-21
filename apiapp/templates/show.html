@@ -1,23 +1,63 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>SHOW</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
-    <script src='main.js'></script>
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+  </head>
+  <body>
     <h4><a href="{% url 'post' %}"><글쓰기></a></h4>
     {% for board in boards.all %}
-        <div class = "container">
-            <a href="{% url 'detail' board.id %}">
-                <h5> Title : {{board.title}} </h5>
-            </a>
-            <p> {{board.body}} </p>
-            <small class='text-muted'>{{board.pub_date}} </small>
-        </div>
+    <div class="container">
+      <a href="{% url 'detail' board.id %}">
+        <h5>Title : {{board.title}}</h5>
+      </a>
+      <p>{{board.body}}</p>
+      <small class="text-muted">{{board.pub_date}} </small>
+    </div>
     {% endfor %}
-</body>
+
+    <div id="map" style="width: 100%; height: 350px"></div>
+
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=	e5f63e1e5bce925ba5a61b8f25480da3&libraries=services"
+    ></script>
+    <script>
+      var mapContainer = document.getElementById("map"),
+        mapOption = {
+          center: new kakao.maps.LatLng(37.651776, 127.016032),
+          level: 3,
+        };
+      var map = new kakao.maps.Map(mapContainer, mapOption);
+      var mapTypeControl = new kakao.maps.MapTypeControl();
+      map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      var geocoder = new kakao.maps.services.Geocoder();
+      geocoder.addressSearch(
+        "서울특별시 도봉구 삼양로 144길 33 덕성여자대학교",
+        function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            var marker = new kakao.maps.Marker({
+              map: map,
+              position: coords,
+            });
+            var infowindow = new kakao.maps.InfoWindow({
+              content:
+                '<div style="width:150px; text-align: center; padding: 6px 0;">덕성여대</div>',
+            });
+            infowindow.open(map, marker);
+
+            map.setCenter(coords);
+          }
+        }
+      );
+    </script>
+  </body>
 </html>
